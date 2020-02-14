@@ -32,7 +32,7 @@ def polls(request, poll_id):
         choice.votes += 1
         choice.save()
     except:
-        choice = Choice(id = poll.id, candidates = selection, votes = 1)
+        choice = Choice(poll_id = poll.id, candidates = selection, votes = 1)
         choice.save()   
 
     return HttpResponse("Finish")

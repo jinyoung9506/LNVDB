@@ -4,5 +4,5 @@ from . import views
 urlpatterns = [
     path('', views.index),
     path('areas/<area>', views.areas),
-    path('polls/<int:poll_id>', views.polls)
+    path('polls/<int:poll_id>/', views.polls)
 ]
