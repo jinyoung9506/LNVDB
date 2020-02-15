@@ -8,7 +8,7 @@ import datetime
 def index(request):
     candidates = Candidate.objects.all()
     context = {'candidates':candidates}
-    
+
     return render(request, 'elections/index.html', context)
 
 def areas(request, area):
@@ -19,20 +19,23 @@ def areas(request, area):
     except:
         poll = None
         candidates = None
-    
+
     context = {'candidates' : candidates, 'area': area, 'poll' : poll}
     return render(request, 'elections/area.html', context)
 
 def polls(request, poll_id):
     poll = Poll.objects.get(pk = poll_id)
     selection = request.POST['choice']
-    
+
     try:
         choice = Choice.objects.get(poll_id = poll.id, candidate_id = selection)
+        choice.candidate_id = 1
         choice.votes += 1
         choice.save()
     except:
-        choice = Choice(poll_id = poll.id, candidates = selection, votes = 1)
-        choice.save()   
+        #최초로 투표하는 경우, DB에 저장된 Choice객체가 없기 때문에 Choice를 새로 생성합니다
+        choice = Choice(poll_id = poll.id, candidate_id = selection, votes = 1)
+        choice.candidate_id = 1
+        choice.save()
 
-    return HttpResponse("Finish")
+    return HttpResponse("finish")
