@@ -29,13 +29,12 @@ def polls(request, poll_id):
 
     try:
         choice = Choice.objects.get(poll_id = poll.id, candidate_id = selection)
-        choice.candidate_id = 1
+        choice.candidate_id = selection
         choice.votes += 1
         choice.save()
     except:
-        #최초로 투표하는 경우, DB에 저장된 Choice객체가 없기 때문에 Choice를 새로 생성합니다
         choice = Choice(poll_id = poll.id, candidate_id = selection, votes = 1)
-        choice.candidate_id = 1
+        choice.candidate_id = selection
         choice.save()
 
     return HttpResponse("finish")
