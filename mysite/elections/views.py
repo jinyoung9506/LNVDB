@@ -24,7 +24,7 @@ def candidates(request, name):
 
 def areas(request, area):
     today = datetime.datetime.now()
-    try:
+    try: 
         poll = Poll.objects.get(area = area, start_date__lte = today, end_date__gte = today)
         candidates = Candidate.objects.filter(area = area)
     except:
