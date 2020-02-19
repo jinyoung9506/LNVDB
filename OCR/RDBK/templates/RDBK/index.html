@@ -1,0 +1,15 @@
+{% extends "RDBK/layout.html" %}
+
+{% block title %}
+폐지읽기
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <form action="uploading" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{form.upfile}}
+        <input type="submit" value="Upload">
+    </form>
+</div>
+{% endblock %}
