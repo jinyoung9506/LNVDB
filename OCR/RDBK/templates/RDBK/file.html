@@ -8,4 +8,9 @@
 <div class="container">
     file uploaded
 </div>
+{% if upfile %}
+<div class="container">
+    <img src="{{upfile.upload.url}}" alt="Uploaded Image" width="50%">
+</div>
+{% endif %}
 {% endblock %}

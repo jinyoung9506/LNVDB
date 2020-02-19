@@ -18,7 +18,7 @@ def upload_file(request):
         if form.is_valid():
             up = FileModel(upload=request.FILES['upfile'])
             up.save()
-            return HttpResponseRedirect('/success/')
+            return render(request, 'RDBK/file.html',{'upfile':up})
         else:
             return HttpResponse('업로드실패')
     else:
