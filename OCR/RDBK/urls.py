@@ -10,4 +10,4 @@ urlpatterns = [
     path('', views.index, name = 'home'),
     path('uploading', views.upload_file),
     path('success/',views.files),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
