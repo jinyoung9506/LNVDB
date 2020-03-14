@@ -1,0 +1,17 @@
+{% extends "accounts/layout.html" %}
+
+{% block title %}
+account
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if user.is_active %}
+        <span class="glyphicon glyphicon-heart"></span> {{user.username}}</a>
+        <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
+    {% else %}
+        <li><a href="{%url 'accounts:login' %}"> <span class="glyphicon glyphicon-user"></span> Login</a></li>
+        <li><a href="{% url 'admin:index' %}">Admin</a></li>
+    {% endif %}
+</div>
+{% endblock %}

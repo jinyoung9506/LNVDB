@@ -3,11 +3,16 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from django.template import RequestContext
 from django.contrib import auth
 from django.contrib.auth.models import User, UserManager
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 # Create your views here.
 
 def account(request):
-    return render(request, 'accounts/login.html')
+    if not request.user.is_authenticated:
+        return render(request, 'accounts/login.html')
+    else:
+        user = request.user
+        return render(request, 'account/def.html',{'user':user})
 
 
 def login(request):
@@ -18,7 +23,7 @@ def login(request):
         if user is not None:
             auth.login(request, user)
             messages.info(request,'로그인 성공!')
-            return redirect('accdef')
+            return render(request, 'accdef', )
         else:
             return render(request, 'accounts/login.html', {'error':'Login Failed'})        
     else:
@@ -36,13 +41,13 @@ def signup(request):
                 email= request.POST['email']
             )
             auth.login(request,user)
-            return render(request, {'Login Success'})
+            return render(request, {'Sign up Success'})
         else:    
             return render(request, 'accounts/signup.html', {'error':'Sign up Failed'})
     else:
         return render(request, 'accounts/signup.html')
 
-
+@login_required
 def logout(request):
     auth.logout(request)
     return render(request, 'accdef')
