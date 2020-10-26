@@ -1,0 +1,43 @@
+{% extends "accounts/layout.html" %}
+
+{% block title %}
+account
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if user.is_authenticated %}
+        <span>Username : {{user.username}}</span>
+        <br>
+        <table>
+            <tr>
+                <th>
+                    ISBN
+                </th>
+                <th>
+                    TITLE
+                </th>
+                <th>
+                    IMG
+                </th>
+            </tr>
+            {% for bks in profile.books %}
+            <tr>
+                <td>
+                    {{bks.isbn}}
+                </td>
+                <td>
+                    {{bks.title}}
+                </td>
+                <td>
+                    <img src="{{bks.imagelink}}">
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <li><a href="{%url 'accounts:linform' %}"> <span class="glyphicon glyphicon-user"></span> Login</a></li>
+        <li><a href="{% url 'admin:index' %}">Admin</a></li>
+    {% endif %}
+</div>
+{% endblock %}
