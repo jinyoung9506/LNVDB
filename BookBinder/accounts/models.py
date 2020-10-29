@@ -5,21 +5,18 @@ from django.dispatch import receiver
 
 # Create your models here.
 class Book(models.Model):
-    isbn = models.CharField(max_length = 13, blank = True)
+    objects = models.Manager()
+
+    owner = models.CharField(max_length = 200, blank = False)
+    isbn = models.CharField(max_length = 13, blank = False)
     title = models.CharField(max_length = 200, blank = True)
     booklink = models.CharField(max_length = 200, blank = True)
-    imagelink = models.CharField(max_length = 200, blank = True)
     author = models.CharField(max_length = 200, blank = True)
     price = models.CharField(max_length = 200, blank = True)
     publisher = models.CharField(max_length = 200, blank = True)
     date = models.CharField(max_length = 200, blank = True)
-    memo = models.CharField(max_length = 200, blank = True)
-    before = models.CharField(max_length = 200, blank = True)
-    after = models.CharField(max_length = 200, blank = True)
+    imagelink = models.CharField(max_length = 200, blank = True)
+    memo = models.CharField(max_length = 200, blank = True, null = False)
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete = models.CASCADE)
-    books = models.ForeignKey(Book, on_delete = models.CASCADE, blank = True)
-
-    
-
+    class Meta:
+        unique_together = (("owner", "isbn"),)

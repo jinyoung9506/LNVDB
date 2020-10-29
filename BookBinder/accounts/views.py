@@ -1,43 +1,160 @@
 from django.shortcuts import render, redirect
+from django.core import serializers
 from django.http import HttpResponse, HttpResponseRedirect, HttpRequest, JsonResponse
 from django.template import RequestContext
 from django.contrib import auth
 from django.contrib.auth.models import User, UserManager
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from accounts.models import Book, Profile
+from accounts.models import Book
+import requests
+import json
 # Create your views here.
 
 def account(request):
     if not request.user.is_authenticated:
-        return render(request, 'accounts/login.html')
+        storage = messages.get_messages(request)
+        storage.used = True
+        return redirect('accounts:linform')
     else:
-        user = request.user
-        profile = Profile(user = user)
-        samplebook1 = Book( isbn = '9784894652385', title = '精装追男姐', imagelink = 'https://images-na.ssl-images-amazon.com/images/I/91d4ugWffJL.jpg')
-        samplebook2 = Book( isbn = '9788926360200', title = '라이트 X 라이트 12', imagelink = 'https://bookthumb-phinf.pstatic.net/cover/116/467/11646733.jpg')
-        samplebook3 = Book( isbn = '9791127857097', title = '곰 곰 곰 베어 11.5', imagelink = 'https://bookthumb-phinf.pstatic.net/cover/167/788/16778844.jpg')
-        profile.books.add(samplebook1)
-        profile.books.add(samplebook2)
-        profile.books.add(samplebook3)
-        profile.save()
-        return render(request, 'accounts/def.html',{'user':user, 'profile':profile})
+        user = User.objects.get(username = request.user.username)
+        book = Book.objects.all()
+        book = Book.objects.filter(owner = user.username)
+        count = book.count()
+        storage = messages.get_messages(request)
+        storage.used = True
+        return render(request, 'accounts/def.html', {'user':user, 'books':book, 'count':count})
 
-def loginform(request):
-    if request.user.is_authenticated:
+def delete(request, isbn):
+    if not request.user.is_authenticated:
+        storage = messages.get_messages(request)
+        storage.used = True
+        return redirect('accounts:linform')
+    else:
+        user = User.objects.get(username = request.user.username)
+        book = Book.objects.all()
+        book = book.filter(owner = user.username).filter(isbn = isbn)
+        book.delete()
+        book = Book.objects.filter(owner = user.username)
+        count = book.count()
+        storage = messages.get_messages(request)
+        storage.used = True
+        return render(request, 'accounts/def.html', {'user':user, 'books':book, 'count':count})
+
+#def readdatafromand(request):
+
+#def senddatatoand(request):
+
+def downtojson(request):
+    if request.method=="POST":   
+        data = json.loads(request.body)
+        username = data['username']
+        password = data['password']
+
+        user = auth.authenticate(request, username = username, password = password)
+        
+        if user is not None:
+            try:
+                auth.login(request,user)
+                book = Book.objects.all().filter( owner = username)
+                booklist = serializers.serialize('json', book)
+                return HttpResponse(booklist, content_type = "text/json-comment-filtered")
+            except:
+                return JsonResponse({"result", "LoginFail"}) 
+        else:
+            return JsonResponse({"result", "LoginFail"}) 
+    else:
+        return JsonResponse({"result", "LoginFail"}) 
+
+
+
+def readdata(request):
+    if not request.user.is_authenticated:
         storage = messages.get_messages(request)
         storage.used = True
         return redirect('accounts:accdef')
     else:
-        return render(request, 'accounts/login.html')
+        user = User.objects.get(username = request.user.username)
+        
 
-def signupform(request):
-    if request.user.is_authenticated:
+        try:
+            Book.objects.create( owner = user.username, isbn = '9788926360200', title = '라이트 X 라이트 12', imagelink = 'https://bookthumb-phinf.pstatic.net/cover/116/467/11646733.jpg')
+        except:
+            book = Book.objects.all()
+        
+        try:
+            Book.objects.create( owner = user.username, isbn = '9791127857097', title = '곰 곰 곰 베어 11.5', imagelink = 'https://bookthumb-phinf.pstatic.net/cover/167/788/16778844.jpg')
+        except:
+            book = Book.objects.all()
+
+        book = Book.objects.filter(owner = user.username)
+        count = book.count()
         storage = messages.get_messages(request)
         storage.used = True
-        return redirect('accounts:accdef')
+        return render(request, 'accounts/def.html', {'user':user, 'books':book, 'count':count})
+
+def upfromjson(request):
+    data = json.loads(request.body)
+
+    if request.user.is_authenticated:
+        return HttpResponse("AlreadyLoginned")
+    if request.method == "POST":
+        data = json.loads(request.body)
+        username = data['username']
+        password = data['password']
+        isbn = data['isbn']
+        title = data['title']
+        booklink = data['booklink']
+        author = data['author']
+        price = data['price']
+        publisher = data['publisher']
+        date = data['date']
+        imagelink = data['imagelink']
+        memo = data['memo']
+
+        user = auth.authenticate(request, username = username, password = password)
+        
+        if user is not None:
+            try:
+                auth.login(request,user)
+                Book.create( owner = username, isbn = isbn, title = title, booklink = booklink, author = author, price = price, publisher = publisher, date = date, imagelink = imagelink, memo = memo )
+                return JsonResponse({"title" : title, "result": "success"})
+            except:
+                book = Book.objects.all()
+                book = book.filter( owner = username, isbn = isbn)
+                book.delete()
+                Book.objects.create( owner = username, isbn = isbn, title = title, booklink = booklink, author = author, price = price, publisher = publisher, date = date, imagelink = imagelink, memo = memo )
+                return JsonResponse({"title" : title, "result": "success"})
+            else:
+                return JsonResponse({"result", "LoginFail"}) 
+        else:
+            return JsonResponse({"result", "LoginFail"})   
     else:
-        return render(request, 'accounts/signup.html')
+        return JsonResponse({"result", "LoginFail"})
+
+def loginfromand(request):
+    if request.user.is_authenticated:
+        return HttpResponse("LoginSuccess")
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = auth.authenticate(request, username = username, password = password)
+        if user is not None:
+            try:
+                auth.login(request,user)
+                return HttpResponse("LoginSuccess")
+            except:
+                return HttpResponse("LoginFailed")
+        else:
+            return HttpResponse("LoginFailed")        
+    else:
+        return HttpResponse("LoginFailed")
+
+@login_required
+def logoutfromand(request):
+    auth.logout(request)
+    return HttpResponse("LogOut")
+
 
 def login(request):
     if request.user.is_authenticated:
@@ -50,11 +167,10 @@ def login(request):
         user = auth.authenticate(request, username = username, password = password)
         if user is not None:
             auth.login(request, user)
-            profile = Profile.objects.get(user = user)
             storage = messages.get_messages(request)
             storage.used = True
             messages.success(request,'로그인 성공!')
-            return render(request, 'accounts/def.html',{'user':user, 'profile':profile})
+            return redirect('accounts:accdef')
         else:
             storage = messages.get_messages(request)
             storage.used = True
@@ -71,35 +187,28 @@ def signup(request):
         storage = messages.get_messages(request)
         storage.used = True
         return redirect('accounts:accdef')
-    if request.method == "POST":
-        if (request.POST["username"] is not None) and (request.POST["password1"] is not None):
-            if request.POST["password1"] == request.POST["password2"]:
-                try:
-                    user = User.objects.create_user(
-                        username = request.POST["username"],
-                        password = request.POST["password1"],
-                        email= request.POST["email"]
-                    )
-                    auth.login(request,user)
-                    storage = messages.get_messages(request)
-                    storage.used = True
-                    messages.success(request,'회원가입 성공!')
-                    return render(request, 'accounts:accdef', {'user':user} )
-                except:
-                    storage = messages.get_messages(request)
-                    storage.used = True
-                    messages.error(request,'회원가입 실패!')    
-                    return redirect('accounts:supform')
+
+    if (request.POST["username"] is not None) and (request.method == "POST") and (request.POST["password1"] == request.POST["password2"]):
+            try:
+                user = User.objects.create_user(
+                    username = request.POST["username"],
+                    password = request.POST["password1"],
+                    email= request.POST["email"]
+                )
+                auth.login(request,user)
+                storage = messages.get_messages(request)
+                storage.used = True
+                messages.success(request,'회원가입 성공!')
+                return redirect(request, 'accounts:accdef', {'user':user} )
+            except:
+                storage = messages.get_messages(request)
+                storage.used = True
+                return redirect('accounts:supform')
             else:
                 storage = messages.get_messages(request)
                 storage.used = True
-                messages.error(request,'회원가입 실패!')    
+                messages.error(request,'회원가입 실패!')  
                 return redirect('accounts:supform')
-        else:
-            storage = messages.get_messages(request)
-            storage.used = True
-            messages.error(request,'회원가입 실패!')
-            return redirect('accounts:supform')
     else:
         storage = messages.get_messages(request)
         storage.used = True
@@ -110,3 +219,19 @@ def signup(request):
 def logout(request):
     auth.logout(request)
     return redirect('accounts:accdef')
+
+def loginform(request):
+    if request.user.is_authenticated:
+        storage = messages.get_messages(request)
+        storage.used = True
+        return redirect('accounts:accdef')
+    else:
+        return render(request, 'accounts/login.html')
+
+def signupform(request):
+    if request.user.is_authenticated:
+        storage = messages.get_messages(request)
+        storage.used = True
+        return redirect('accounts:accdef')
+    else:
+        return render(request, 'accounts/signup.html')

@@ -7,37 +7,72 @@ account
 {% block content %}
 <div class="container">
     {% if user.is_authenticated %}
-        <span>Username : {{user.username}}</span>
+        <div>Username : {{user.username}}</div>
+        <div style="text-align: right;">등록된 건수 : {{count}}건</div>
         <br>
-        <table>
-            <tr>
-                <th>
-                    ISBN
-                </th>
-                <th>
-                    TITLE
-                </th>
-                <th>
-                    IMG
-                </th>
+        <table class="table" style="text-align: center;">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col" style="text-align: center;">
+                        ISBN
+                    </th>
+                    <th scope="col" style="text-align: center;">
+                        제목
+                    </th>
+                    <th scope="col" style="text-align: center;">
+                        저자
+                    </th>
+                    <th scope="col" style="text-align: center;">
+                        정가
+                    </th>
+                    <th scope="col" style="text-align: center;">
+                        출판사/레이블
+                    </th>
+                    <th scope="col" style="text-align: center;">
+                        발매일
+                    </th>
+                    <th scope="col" style="text-align: center;">
+                        표지
+                    </th>
+                    <th scope="col" style="text-align: center;">
+                        메모
+                    </th>
+                    <th scope="col" style="text-align: center;">
+                        삭제
+                    </th>
+                </thead>
             </tr>
-            {% for bks in profile.books %}
+            {% for bks in books %}
             <tr>
+                <td>{{bks.isbn}}</td>
                 <td>
-                    {{bks.isbn}}
+                    <a href="{{bks.booklink}}">
+                        {{bks.title}}
+                    </a>
                 </td>
+                <td>{{bks.author}}</td>
+                <td>{{bks.price}}</td>
+                <td>{{bks.publisher}}</td>
+                <td>{{bks.date}}</td>
                 <td>
-                    {{bks.title}}
+                    <a href="{{bks.imagelink}}">
+                        <img src="{{bks.imagelink}}" width="75" height="100">
+                    </a>
                 </td>
+                <td>{{bks.memo}}</td>
                 <td>
-                    <img src="{{bks.imagelink}}">
+                   <form action="{% url 'accounts:delete' bks.isbn %}" method="POST">
+                       {% csrf_token %}
+                       <input type="submit" value="Delete">
+                   </form>
                 </td>
             </tr>
             {% endfor %}
         </table>
-    {% else %}
-        <li><a href="{%url 'accounts:linform' %}"> <span class="glyphicon glyphicon-user"></span> Login</a></li>
-        <li><a href="{% url 'admin:index' %}">Admin</a></li>
+        <br>
+        <a href="{% url 'accounts:readdata' %}">
+            <button type="menu" class="btn btn-primary">readdata</button>
+        </a>
     {% endif %}
 </div>
 {% endblock %}
