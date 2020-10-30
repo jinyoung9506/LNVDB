@@ -8,7 +8,7 @@ class Book(models.Model):
     objects = models.Manager()
 
     owner = models.CharField(max_length = 200, blank = False)
-    isbn = models.CharField(max_length = 13, blank = False)
+    isbn = models.CharField(max_length = 200, blank = False)
     title = models.CharField(max_length = 200, blank = True)
     booklink = models.CharField(max_length = 200, blank = True)
     author = models.CharField(max_length = 200, blank = True)

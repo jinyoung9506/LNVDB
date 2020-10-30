@@ -25,7 +25,7 @@ def account(request):
         storage.used = True
         return render(request, 'accounts/def.html', {'user':user, 'books':book, 'count':count})
 
-def delete(request, isbn):
+def deletedata(request, isbn):
     if not request.user.is_authenticated:
         storage = messages.get_messages(request)
         storage.used = True
