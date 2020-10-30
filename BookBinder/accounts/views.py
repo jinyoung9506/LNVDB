@@ -67,32 +67,6 @@ def downtojson(request):
         return JsonResponse({"result", "LoginFail"}) 
 
 
-
-def readdata(request):
-    if not request.user.is_authenticated:
-        storage = messages.get_messages(request)
-        storage.used = True
-        return redirect('accounts:accdef')
-    else:
-        user = User.objects.get(username = request.user.username)
-        
-
-        try:
-            Book.objects.create( owner = user.username, isbn = '9788926360200', title = '라이트 X 라이트 12', imagelink = 'https://bookthumb-phinf.pstatic.net/cover/116/467/11646733.jpg')
-        except:
-            book = Book.objects.all()
-        
-        try:
-            Book.objects.create( owner = user.username, isbn = '9791127857097', title = '곰 곰 곰 베어 11.5', imagelink = 'https://bookthumb-phinf.pstatic.net/cover/167/788/16778844.jpg')
-        except:
-            book = Book.objects.all()
-
-        book = Book.objects.filter(owner = user.username)
-        count = book.count()
-        storage = messages.get_messages(request)
-        storage.used = True
-        return render(request, 'accounts/def.html', {'user':user, 'books':book, 'count':count})
-
 def upfromjson(request):
     data = json.loads(request.body)
 

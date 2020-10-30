@@ -14,7 +14,6 @@ urlpatterns = [
     path('signup/', views.signupform, name = 'supform' ),
     path('dosignup/', views.signup, name = 'sup' ),
     path('logout/', views.logout, name = 'lout'),
-    path('readdata/', views.readdata, name = 'readdata'),
     path('loginfromand/', views.loginfromand, name = 'linfand'),
     path('logoutfromand/', views.logoutfromand, name = 'loutfand'),
     path('upfromjson/', views.upfromjson, name = 'linfjson'),
