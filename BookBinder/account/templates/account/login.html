@@ -1,4 +1,4 @@
-{% extends "accounts/layout.html" %}
+{% extends "account/layout.html" %}
 
 {% block title %}
 Login
@@ -7,7 +7,7 @@ Login
 {% block content %}
 
 <div class="container">
-    <form method="POST" action="{% url 'accounts:lin'%}">
+    <form method="POST" action="{% url 'account:lin'%}">
        {% csrf_token %}
        Username:
        <br>
@@ -18,10 +18,10 @@ Login
        <input name="password" type="password">
        <br><br>
        <input type="submit" class="btn btn-primary" value="Sign in">
-    </form>
+    </form>  
     <br>
-    <a href="{% url 'accounts:supform' %}">
-        <button type="menu" class="btn btn-primary">Sign up</button>
+    <a href="{% url 'account:supform' %}">
+        <button type="menu" class="btn btn-primary" >Sign up</button>
     </a>
 </div>
 {% endblock %}

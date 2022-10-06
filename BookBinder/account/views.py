@@ -6,7 +6,7 @@ from django.contrib import auth
 from django.contrib.auth.models import User, UserManager
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from accounts.models import Book
+from account.models import Book
 import requests
 import json
 # Create your views here.
@@ -15,7 +15,7 @@ def account(request):
     if not request.user.is_authenticated:
         storage = messages.get_messages(request)
         storage.used = True
-        return redirect('accounts:linform')
+        return redirect('account:linform')
     else:
         user = User.objects.get(username = request.user.username)
         book = Book.objects.all()
@@ -23,23 +23,23 @@ def account(request):
         count = book.count()
         storage = messages.get_messages(request)
         storage.used = True
-        return render(request, 'accounts/def.html', {'user':user, 'books':book, 'count':count})
+        return render(request, 'account/def.html', {'user':user, 'books':book, 'count':count})
 
 def deletedata(request, isbn):
     if not request.user.is_authenticated:
         storage = messages.get_messages(request)
         storage.used = True
-        return redirect('accounts:linform')
+        return redirect('account:linform')
     else:
         user = User.objects.get(username = request.user.username)
         book = Book.objects.all()
-        book = book.filter(owner = user.username).filter(isbn = isbn)
+        book = book.filter(owner = user).filter(isbn = isbn)
         book.delete()
-        book = Book.objects.filter(owner = user.username)
+        book = Book.objects.filter(owner = user)
         count = book.count()
         storage = messages.get_messages(request)
         storage.used = True
-        return render(request, 'accounts/def.html', {'user':user, 'books':book, 'count':count})
+        return render(request, 'account/def.html', {'user':user, 'books':book, 'count':count})
 
 #def readdatafromand(request):
 
@@ -134,7 +134,7 @@ def login(request):
     if request.user.is_authenticated:
         storage = messages.get_messages(request)
         storage.used = True
-        return redirect('accounts:accdef')
+        return redirect('account:accdef')
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -144,23 +144,23 @@ def login(request):
             storage = messages.get_messages(request)
             storage.used = True
             messages.success(request,'로그인 성공!')
-            return redirect('accounts:accdef')
+            return redirect('account:accdef')
         else:
             storage = messages.get_messages(request)
             storage.used = True
             messages.error(request,'로그인 실패!')
-            return redirect('accounts:linform')        
+            return redirect('account:linform')        
     else:
         storage = messages.get_messages(request)
         storage.used = True
         messages.error(request, '잘못된 접근입니다')
-        return redirect('accounts:accdef')
+        return redirect('account:accdef')
 
 def signup(request):
     if request.user.is_authenticated:
         storage = messages.get_messages(request)
         storage.used = True
-        return redirect('accounts:accdef')
+        return redirect('account:accdef')
 
     if (request.POST["username"] is not None) and (request.method == "POST") and (request.POST["password1"] == request.POST["password2"]):
             try:
@@ -173,39 +173,39 @@ def signup(request):
                 storage = messages.get_messages(request)
                 storage.used = True
                 messages.success(request,'회원가입 성공!')
-                return redirect(request, 'accounts:accdef', {'user':user} )
+                return redirect(request, 'account:accdef', {'user':user} )
             except:
                 storage = messages.get_messages(request)
                 storage.used = True
-                return redirect('accounts:supform')
+                return redirect('account:supform')
             else:
                 storage = messages.get_messages(request)
                 storage.used = True
                 messages.error(request,'회원가입 실패!')  
-                return redirect('accounts:supform')
+                return redirect('account:supform')
     else:
         storage = messages.get_messages(request)
         storage.used = True
         messages.error(request, '잘못된 접근입니다')
-        return redirect('accounts:accdef')
+        return redirect('account:accdef')
 
 @login_required
 def logout(request):
     auth.logout(request)
-    return redirect('accounts:accdef')
+    return redirect('account:accdef')
 
 def loginform(request):
     if request.user.is_authenticated:
         storage = messages.get_messages(request)
         storage.used = True
-        return redirect('accounts:accdef')
+        return redirect('account:accdef')
     else:
-        return render(request, 'accounts/login.html')
+        return render(request, 'account/login.html')
 
 def signupform(request):
     if request.user.is_authenticated:
         storage = messages.get_messages(request)
         storage.used = True
-        return redirect('accounts:accdef')
+        return redirect('account:accdef')
     else:
-        return render(request, 'accounts/signup.html')
+        return render(request, 'account/signup.html')

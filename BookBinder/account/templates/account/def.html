@@ -1,4 +1,4 @@
-{% extends "accounts/layout.html" %}
+{% extends "account/layout.html" %}
 
 {% block title %}
 account
@@ -61,7 +61,7 @@ account
                 </td>
                 <td>{{bks.memo}}</td>
                 <td>
-                   <form action="{% url 'accounts:deletedata' bks.isbn %}" method="POST">
+                   <form action="{% url 'account:deletedata' bks.isbn %}" method="POST">
                        {% csrf_token %}
                        <input type="submit" value="Delete">
                    </form>

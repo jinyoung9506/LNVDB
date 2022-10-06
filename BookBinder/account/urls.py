@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 
 from . import views
 
-app_name = 'accounts'
+app_name = 'account'
 urlpatterns = [
     path('', views.account, name = 'accdef'),
     path('', views.account, name = 'home'),

@@ -1,4 +1,4 @@
-{% extends "accounts/layout.html" %}
+{% extends "account/layout.html" %}
 
 {% block title %}
 Sign up
@@ -6,7 +6,7 @@ Sign up
 
 {% block content %}
 <div class="container">
-    <form method="POST" action="{% url 'accounts:sup'%}">
+    <form method="POST" action="{% url 'account:sup'%}">
        {% csrf_token %}
        Username:
        <br>
